@@ -27,7 +27,6 @@ android {
         versionCode 1
         versionName "1.0"
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary true
         }
@@ -50,13 +49,14 @@ android {
         compose true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion '1.5.1'
+        kotlinCompilerExtensionVersion '1.5.10'
     }
     packaging {
-        resources {
-            excludes += '/META-INF/{AL2.0,LGPL2.1}'
-        }
+        resources.excludes.add("META-INF/LICENSE.md")
+        resources.excludes.add("META-INF/LICENSE-notice.md")
+        resources.excludes.add("META-INF/{AL2.0,LGPL2.1}")
     }
+
 }
 
 dependencies {
