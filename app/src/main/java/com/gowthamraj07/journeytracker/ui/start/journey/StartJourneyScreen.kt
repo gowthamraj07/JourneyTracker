@@ -14,11 +14,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.gowthamraj07.journeytracker.ui.destinations.OngoingJourneyScreenDestination
 import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 
 @Destination
 @Composable
-fun StartJourneyScreen() {
+fun StartJourneyScreen(
+    navigator: DestinationsNavigator
+) {
     Column(
         modifier = Modifier
             .background(color = MaterialTheme.colorScheme.surface)
@@ -37,7 +42,9 @@ fun StartJourneyScreen() {
         )
         Button(
             modifier = Modifier.align(Alignment.CenterHorizontally),
-            onClick = { /*TODO*/ }
+            onClick = {
+                navigator.navigate(OngoingJourneyScreenDestination)
+            }
         ) {
             Text(text = "Start Journey")
         }
@@ -47,5 +54,5 @@ fun StartJourneyScreen() {
 @Preview
 @Composable
 fun StartJourneyScreenPreview() {
-    StartJourneyScreen()
+    StartJourneyScreen(navigator = EmptyDestinationsNavigator)
 }
