@@ -3,7 +3,9 @@ package com.gowthamraj07.journeytracker.ui.start.journey
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
@@ -65,18 +67,17 @@ private fun StartJourneyContent(paddingValues: PaddingValues, navigator: Destina
             .fillMaxSize()
             .padding(paddingValues)
             .padding(16.dp)
-
-
     ) {
+        Spacer(modifier = Modifier.weight(1f))
         Text(
             text = "You are ready to start your journey!",
             style = MaterialTheme.typography.titleLarge,
             textAlign = TextAlign.Center,
             modifier = Modifier
-                .weight(1f)
-                .fillMaxSize()
+                .fillMaxWidth()
                 .wrapContentSize(align = Alignment.Center)
         )
+        Spacer(modifier = Modifier.padding(16.dp))
         Button(
             modifier = Modifier.align(Alignment.CenterHorizontally),
             onClick = {
@@ -85,6 +86,7 @@ private fun StartJourneyContent(paddingValues: PaddingValues, navigator: Destina
         ) {
             Text(text = "Start Journey")
         }
+        Spacer(modifier = Modifier.weight(1f))
     }
 }
 
