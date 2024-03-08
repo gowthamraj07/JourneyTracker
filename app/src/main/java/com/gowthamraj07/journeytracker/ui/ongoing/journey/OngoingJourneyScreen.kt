@@ -21,7 +21,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.gowthamraj07.journeytracker.domain.Place
-import com.gowthamraj07.journeytracker.ui.destinations.StartJourneyScreenDestination
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
@@ -56,7 +55,7 @@ fun OngoingJourneyScreen(
                         style = MaterialTheme.typography.labelLarge,
                         color = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.padding(16.dp).clickable {
-                            navigator.navigate(StartJourneyScreenDestination)
+                            navigator.navigateUp()
                         }
                     )
                 },
