@@ -46,7 +46,7 @@ import org.koin.androidx.compose.koinViewModel
 @RootNavGraph(start = true)
 @Destination
 @Composable
-fun Trips(
+fun TripsScreen(
     uiStateFlow: StateFlow<TripsUiState> = koinViewModel<TripsViewModel>().state,
     navigator: DestinationsNavigator,
 ) {
@@ -144,7 +144,7 @@ fun ColumnScope.EmptyTripsState() {
 @Preview
 @Composable
 fun TripsPreview_EmptyState() {
-    Trips(
+    TripsScreen(
         uiStateFlow = MutableStateFlow(TripsUiState.Empty),
         navigator = EmptyDestinationsNavigator
     )
@@ -153,7 +153,7 @@ fun TripsPreview_EmptyState() {
 @Preview
 @Composable
 fun TripsPreview_DataState() {
-    Trips(
+    TripsScreen(
         uiStateFlow = MutableStateFlow(
             TripsUiState.Data(
                 flowOf(
