@@ -38,13 +38,16 @@ import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flowOf
+import org.koin.androidx.compose.koinViewModel
 
 @RootNavGraph(start = true)
 @Destination
 @Composable
 fun Trips(
-    uiState: TripsUiState,
+    uiStateFlow: StateFlow<TripsUiState> = koinViewModel<TripsViewModel>().state,
     navigator: DestinationsNavigator,
 ) {
     Scaffold(
@@ -59,9 +62,10 @@ fun Trips(
                 .fillMaxSize()
                 .padding(it)
         ) {
-            when (uiState) {
+            val uiState = uiStateFlow.collectAsState()
+            when (uiState.value) {
                 is TripsUiState.Empty -> EmptyTripsState()
-                is TripsUiState.Data -> ListOfTripsState(uiState.trips)
+                is TripsUiState.Data -> ListOfTripsState((uiState.value as TripsUiState.Data).trips)
             }
         }
     }
@@ -141,7 +145,7 @@ fun ColumnScope.EmptyTripsState() {
 @Composable
 fun TripsPreview_EmptyState() {
     Trips(
-        uiState = TripsUiState.Empty,
+        uiStateFlow = MutableStateFlow(TripsUiState.Empty),
         navigator = EmptyDestinationsNavigator
     )
 }
@@ -150,19 +154,21 @@ fun TripsPreview_EmptyState() {
 @Composable
 fun TripsPreview_DataState() {
     Trips(
-        uiState = TripsUiState.Data(
-            flowOf(
-                listOf(
-                    Trip(
-                        id = 1,
-                        name = "Brussels day trip on 22 Oct 2023",
-                        image = TripImage.LocalImage(id = R.drawable.bouncing_circles)
-                    ),
-                    Trip(
-                        id = 2,
-                        name = "Ghent day trip on 23 Oct 2023",
-                        image = TripImage.LocalImage(id = R.drawable.error_loading_image)
-                    ),
+        uiStateFlow = MutableStateFlow(
+            TripsUiState.Data(
+                flowOf(
+                    listOf(
+                        Trip(
+                            id = 1,
+                            name = "Trip to the beach",
+                            image = TripImage.LocalImage(R.drawable.bouncing_circles)
+                        ),
+                        Trip(
+                            id = 2,
+                            name = "Trip to the mountains",
+                            image = TripImage.LocalImage(R.drawable.error_loading_image)
+                        ),
+                    )
                 )
             )
         ),
