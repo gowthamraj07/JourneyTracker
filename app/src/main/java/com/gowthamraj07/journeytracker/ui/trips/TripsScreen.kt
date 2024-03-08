@@ -48,34 +48,24 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flowOf
 import org.koin.androidx.compose.koinViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @RootNavGraph(start = true)
 @Destination
 @Composable
 fun TripsScreen(
-    uiStateFlow: StateFlow<TripsUiState> = koinViewModel<TripsViewModel>().state,
+    viewModel: TripsViewModel = koinViewModel(),
     navigator: DestinationsNavigator,
 ) {
+    TripsScreenContent(navigator, viewModel.state)
+}
+
+@Composable
+private fun TripsScreenContent(
+    navigator: DestinationsNavigator,
+    uiStateFlow: StateFlow<TripsUiState>
+) {
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "Trips",
-                        style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                },
-                modifier = Modifier.shadow(4.dp)
-            )
-        },
-        floatingActionButton = {
-            FloatingActionButton(onClick = {
-                navigator.navigate(StartJourneyScreenDestination)
-            }) {
-                Icon(Icons.Filled.Add, contentDescription = "Add Trip")
-            }
-        }
+        topBar = { TopBar() },
+        floatingActionButton = { TripsFloatingActionButton(navigator) }
     ) {
         Column(
             modifier = Modifier
@@ -89,6 +79,30 @@ fun TripsScreen(
             }
         }
     }
+}
+
+@Composable
+private fun TripsFloatingActionButton(navigator: DestinationsNavigator) {
+    FloatingActionButton(onClick = {
+        navigator.navigate(StartJourneyScreenDestination)
+    }) {
+        Icon(Icons.Filled.Add, contentDescription = "Add Trip")
+    }
+}
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+private fun TopBar() {
+    TopAppBar(
+        title = {
+            Text(
+                text = "Trips",
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        },
+        modifier = Modifier.shadow(4.dp)
+    )
 }
 
 @Composable
@@ -175,7 +189,7 @@ fun ColumnScope.EmptyTripsState() {
 @Preview
 @Composable
 fun TripsPreview_EmptyState() {
-    TripsScreen(
+    TripsScreenContent(
         uiStateFlow = MutableStateFlow(TripsUiState.Empty),
         navigator = EmptyDestinationsNavigator
     )
@@ -184,7 +198,7 @@ fun TripsPreview_EmptyState() {
 @Preview
 @Composable
 fun TripsPreview_DataState() {
-    TripsScreen(
+    TripsScreenContent(
         uiStateFlow = MutableStateFlow(
             TripsUiState.Data(
                 flowOf(
