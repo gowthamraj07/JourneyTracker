@@ -1,0 +1,14 @@
+android {
+
+}
+
+dependencies {
+    def koin_android_version= "3.3.0"
+    implementation "io.insert-koin:koin-android:$koin_android_version"
+    implementation "io.insert-koin:koin-android-compat:$koin_android_version"
+    implementation "io.insert-koin:koin-androidx-workmanager:$koin_android_version"
+    implementation "io.insert-koin:koin-androidx-navigation:$koin_android_version"
+
+    testImplementation("io.insert-koin:koin-test:$koin_android_version")
+    androidTestImplementation("io.insert-koin:koin-test:$koin_android_version")
+}

@@ -1,0 +1,16 @@
+android.testOptions {
+    unitTests.all {
+        it.useJUnitPlatform()
+    }
+}
+
+dependencies {
+    def version = "5.8.0"
+    testImplementation "io.kotest:kotest-runner-junit5:$version"
+    testImplementation "io.kotest:kotest-assertions-core:$version"
+    androidTestImplementation "io.kotest:kotest-assertions-core:$version"
+    testImplementation "io.kotest:kotest-property:$version"
+    androidTestImplementation "io.kotest:kotest-property:$version"
+
+    testImplementation libs.junit
+}

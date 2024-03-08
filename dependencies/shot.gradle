@@ -1,0 +1,23 @@
+apply plugin: "shot"
+
+android {
+    defaultConfig {
+        testApplicationId "com.gowthamraj07.journeytracker.test"
+        testInstrumentationRunner "com.karumi.shot.ShotTestRunner"
+    }
+
+}
+
+dependencies {
+    // Activity Scenario test rule for screen shot testing
+    androidTestImplementation libs.androidx.junit.ktx
+    androidTestImplementation libs.androidx.junit
+
+    // Multi-dex support
+    def multidex_version = "2.0.1"
+    implementation "androidx.multidex:multidex:$multidex_version"
+}
+
+shot {
+    applicationId = "com.gowthamraj07.journeytracker"
+}

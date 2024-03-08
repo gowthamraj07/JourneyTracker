@@ -1,0 +1,5 @@
+dependencies {
+    //mockk
+    testImplementation libs.mockk
+    androidTestImplementation libs.mockk.android
+}

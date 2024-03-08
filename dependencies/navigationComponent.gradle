@@ -1,0 +1,11 @@
+apply plugin: "androidx.navigation.safeargs.kotlin"
+
+dependencies {
+    // Navigation component
+    def nav_version = "2.5.3"
+    implementation "androidx.navigation:navigation-fragment:$nav_version"
+    implementation "androidx.navigation:navigation-ui:$nav_version"
+
+    // Testing Navigation
+    androidTestImplementation "androidx.navigation:navigation-testing:$nav_version"
+}

@@ -1,0 +1,6 @@
+dependencies {
+    implementation libs.kotlinx.coroutines.android
+
+    testImplementation libs.turbine
+    testImplementation libs.kotlinx.coroutines.test
+}

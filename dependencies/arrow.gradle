@@ -1,0 +1,7 @@
+android {
+
+}
+
+dependencies {
+    implementation libs.arrow.core
+}
