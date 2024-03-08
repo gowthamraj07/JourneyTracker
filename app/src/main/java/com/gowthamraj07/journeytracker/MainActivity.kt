@@ -7,8 +7,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import com.gowthamraj07.journeytracker.ui.NavGraphs
 import com.gowthamraj07.journeytracker.ui.theme.JourneyTrackerTheme
-import com.gowthamraj07.journeytracker.ui.trips.NavGraphs
 import com.ramcosta.composedestinations.DestinationsNavHost
 
 class MainActivity : ComponentActivity() {

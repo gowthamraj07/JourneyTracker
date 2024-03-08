@@ -34,6 +34,7 @@ import coil.request.ImageRequest
 import com.gowthamraj07.journeytracker.R
 import com.gowthamraj07.journeytracker.domain.Trip
 import com.gowthamraj07.journeytracker.domain.TripImage
+import com.gowthamraj07.journeytracker.ui.destinations.StartJourneyScreenDestination
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -53,7 +54,9 @@ fun TripsScreen(
 ) {
     Scaffold(
         floatingActionButton = {
-            FloatingActionButton(onClick = { /*TODO*/ }) {
+            FloatingActionButton(onClick = {
+                navigator.navigate(StartJourneyScreenDestination)
+            }) {
                 Icon(Icons.Filled.Add, contentDescription = "Add Trip")
             }
         }
