@@ -103,13 +103,13 @@ private fun BoxScope.CardTitle(trip: Trip) {
         modifier = Modifier
             .padding(16.dp)
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.1f))
+            .background(MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f))
             .align(Alignment.BottomCenter)
     ) {
         Text(
             text = trip.name,
             style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            color = MaterialTheme.colorScheme.onPrimary,
             modifier = Modifier
                 .align(Center)
                 .padding(16.dp),
@@ -134,7 +134,8 @@ private fun CardBackgroundImage(trip: Trip) {
         painter = painter,
         contentDescription = "Loaded image",
         modifier = Modifier.fillMaxWidth(),
-        contentScale = ContentScale.Crop
+        contentScale = ContentScale.Crop,
+        alpha = 0.1f
     )
 }
 
