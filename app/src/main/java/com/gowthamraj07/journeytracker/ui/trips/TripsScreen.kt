@@ -3,6 +3,7 @@ package com.gowthamraj07.journeytracker.ui.trips
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxSize
@@ -90,41 +91,51 @@ private fun TripDetails(trip: Trip) {
             .heightIn(max = 200.dp)
     ) {
         Box {
-            val painter = rememberAsyncImagePainter(
-                ImageRequest.Builder(LocalContext.current)
-                    .data(data = trip.image)
-                    .apply<ImageRequest.Builder>(block = {
-                        placeholder(R.drawable.bouncing_circles)
-                        error(R.drawable.error_loading_image)
-                    }).build()
-            )
-
-            Image(
-                painter = painter,
-                contentDescription = "Loaded image",
-                modifier = Modifier.fillMaxWidth(),
-                contentScale = ContentScale.Crop
-            )
-            Box(
-                modifier = Modifier
-                    .padding(16.dp)
-                    .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.1f))
-                    .align(Alignment.BottomCenter)
-            ) {
-                Text(
-                    text = trip.name,
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier
-                        .align(Center)
-                        .padding(16.dp),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-            }
+            CardBackgroundImage(trip)
+            CardTitle(trip)
         }
     }
+}
+
+@Composable
+private fun BoxScope.CardTitle(trip: Trip) {
+    Box(
+        modifier = Modifier
+            .padding(16.dp)
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.1f))
+            .align(Alignment.BottomCenter)
+    ) {
+        Text(
+            text = trip.name,
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier
+                .align(Center)
+                .padding(16.dp),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+    }
+}
+
+@Composable
+private fun CardBackgroundImage(trip: Trip) {
+    val painter = rememberAsyncImagePainter(
+        ImageRequest.Builder(LocalContext.current)
+            .data(data = trip.image)
+            .apply(block = {
+                placeholder(R.drawable.bouncing_circles)
+                error(R.drawable.error_loading_image)
+            }).build()
+    )
+
+    Image(
+        painter = painter,
+        contentDescription = "Loaded image",
+        modifier = Modifier.fillMaxWidth(),
+        contentScale = ContentScale.Crop
+    )
 }
 
 @Composable
