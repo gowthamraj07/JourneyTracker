@@ -6,6 +6,13 @@ android {
         testInstrumentationRunner "com.karumi.shot.ShotTestRunner"
     }
 
+    testOptions {
+        packagingOptions {
+            jniLibs {
+                useLegacyPackaging = true
+            }
+        }
+    }
 }
 
 dependencies {

@@ -5,6 +5,8 @@ import com.gowthamraj07.journeytracker.domain.Trip
 import com.gowthamraj07.journeytracker.domain.TripImage
 import com.karumi.shot.ScreenshotTest
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
+import io.mockk.every
+import io.mockk.mockk
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Rule
 import org.junit.Test
@@ -19,7 +21,7 @@ class TripsScreenScreenshotTest : ScreenshotTest {
         with(composeTestRule) {
             setContent {
                 TripsScreen(
-                    uiStateFlow = MutableStateFlow(TripsUiState.Empty),
+                    viewModel = mockkViewModelWith(MutableStateFlow(TripsUiState.Empty)),
                     navigator = EmptyDestinationsNavigator
                 )
             }
@@ -33,18 +35,20 @@ class TripsScreenScreenshotTest : ScreenshotTest {
         with(composeTestRule) {
             setContent {
                 TripsScreen(
-                    uiStateFlow = MutableStateFlow(
-                        TripsUiState.Data(
-                            MutableStateFlow(
-                                listOf(
-                                    Trip(
-                                        id = 1,
-                                        name = "Trip to beach",
-                                        image = TripImage.RemoteImage(
-                                            url = "https://fastly.picsum.photos/id/2/5000/3333.jpg?hmac=_KDkqQVttXw_nM-RyJfLImIbafFrqLsuGO5YuHqD-qQ"
+                    viewModel = mockkViewModelWith(
+                        MutableStateFlow(
+                            TripsUiState.Data(
+                                MutableStateFlow(
+                                    listOf(
+                                        Trip(
+                                            id = 1,
+                                            name = "Trip to beach",
+                                            image = TripImage.RemoteImage(
+                                                url = "https://fastly.picsum.photos/id/2/5000/3333.jpg?hmac=_KDkqQVttXw_nM-RyJfLImIbafFrqLsuGO5YuHqD-qQ"
+                                            )
                                         )
-                                    )
 
+                                    )
                                 )
                             )
                         )
@@ -54,6 +58,13 @@ class TripsScreenScreenshotTest : ScreenshotTest {
             }
 
             compareScreenshot(this)
+        }
+    }
+
+    private fun mockkViewModelWith(mutableStateFlow: MutableStateFlow<TripsUiState>): TripsViewModel {
+        return mockk<TripsViewModel> {
+            every { state } returns mutableStateFlow
+            every { loadTrips() } returns Unit
         }
     }
 }
