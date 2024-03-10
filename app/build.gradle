@@ -16,6 +16,7 @@ apply from: "../dependencies/fragmentTesting.gradle"
 apply from: "../dependencies/mockk.gradle"
 apply from: "../dependencies/kotest.gradle"
 apply from: "../dependencies/shot.gradle"
+apply from: "../dependencies/permissions.gradle"
 
 android {
     namespace 'com.gowthamraj07.journeytracker'
