@@ -24,45 +24,31 @@ import com.gowthamraj07.journeytracker.domain.Place
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Destination
 @Composable
 fun OngoingJourneyScreen(
-    places: Flow<List<Place>> = koinViewModel<OngoingJourneyViewModel>().places,
+    viewModel: OngoingJourneyViewModel = koinViewModel(),
     navigator: DestinationsNavigator
 ) {
     val coroutineScope = rememberCoroutineScope()
+    OngoingJourneyScreenContent(navigator, coroutineScope, viewModel.places)
+}
 
+@Composable
+private fun OngoingJourneyScreenContent(
+    navigator: DestinationsNavigator,
+    coroutineScope: CoroutineScope,
+    places: Flow<List<Place>>
+) {
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "Ongoing Journey",
-                        style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                },
-                actions = {
-                    Text(
-                        text = "Stop",
-                        style = MaterialTheme.typography.labelLarge,
-                        color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.padding(16.dp).clickable {
-                            navigator.navigateUp()
-                        }
-                    )
-                },
-                modifier = Modifier.shadow(elevation = 4.dp),
-            )
-        }
-
+        topBar = { TopBar(navigator) }
     ) { paddingValues ->
         Box(
             modifier = Modifier
@@ -85,6 +71,33 @@ fun OngoingJourneyScreen(
 }
 
 @Composable
+@OptIn(ExperimentalMaterial3Api::class)
+private fun TopBar(navigator: DestinationsNavigator) {
+    TopAppBar(
+        title = {
+            Text(
+                text = "Ongoing Journey",
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        },
+        actions = {
+            Text(
+                text = "Stop",
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier
+                    .padding(16.dp)
+                    .clickable {
+                        navigator.navigateUp()
+                    }
+            )
+        },
+        modifier = Modifier.shadow(elevation = 4.dp),
+    )
+}
+
+@Composable
 fun PlaceDetails(place: Place) {
     Card(modifier = Modifier.padding(top = 16.dp, start = 16.dp, end = 16.dp)) {
         AsyncImage(model = place.imageUrl, contentDescription = null)
@@ -94,5 +107,5 @@ fun PlaceDetails(place: Place) {
 @Preview
 @Composable
 fun OngoingJourneyPreview() {
-    OngoingJourneyScreen(flowOf(emptyList()), navigator = EmptyDestinationsNavigator)
+    OngoingJourneyScreenContent(places = flowOf(value = emptyList()), navigator = EmptyDestinationsNavigator, coroutineScope = rememberCoroutineScope())
 }
