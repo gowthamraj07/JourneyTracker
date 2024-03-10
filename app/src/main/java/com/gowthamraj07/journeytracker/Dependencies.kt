@@ -49,7 +49,7 @@ val dependencies = module {
             "trip_database"
         ).build().placeDao()
     }
-    factory<PlacesRepository> { PlacesRepositoryImpl(get()) }
+    factory<PlacesRepository> { PlacesRepositoryImpl(get(), get()) }
     factory { LoadPlacesUseCase(get()) }
     viewModel {
         OngoingJourneyViewModel(get())
