@@ -3,24 +3,26 @@ package com.gowthamraj07.journeytracker.ui.trips
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gowthamraj07.journeytracker.domain.usecase.GetTripsUseCase
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class TripsViewModel(private val getTripsUseCase: GetTripsUseCase) : ViewModel() {
     fun loadTrips() {
         viewModelScope.launch {
-            getTripsUseCase.execute().map {
+            val tripsFlow = getTripsUseCase.execute()
+            tripsFlow.map {
                 if (it.isEmpty()) {
                     TripsUiState.Empty
                 } else {
-                    TripsUiState.Data(getTripsUseCase.execute())
+                    TripsUiState.Data(tripsFlow)
                 }
-            }.flowOn(Dispatchers.IO).collect {
-                _uiState.value = it
+            }.collect { newState ->
+                _uiState.update {
+                    newState
+                }
             }
         }
     }
