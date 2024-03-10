@@ -33,7 +33,7 @@ class OngoingJourneyViewModelTest : StringSpec({
     }
 
     "trigger load places from use case" {
-        viewModel.loadPlaces()
+        viewModel.loadPlacesFor()
 
         coVerify {
             loadPlacesUseCase.execute()
@@ -54,7 +54,7 @@ class OngoingJourneyViewModelTest : StringSpec({
         )
         coEvery { loadPlacesUseCase.execute() } returns placesFlow
 
-        viewModel.loadPlaces()
+        viewModel.loadPlacesFor()
 
         viewModel.places.value shouldBe OngoingJourneyUIState.Data(placesFlow)
     }

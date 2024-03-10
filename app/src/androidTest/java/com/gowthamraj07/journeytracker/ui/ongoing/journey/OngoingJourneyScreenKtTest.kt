@@ -27,7 +27,7 @@ class OngoingJourneyScreenKtTest {
         }
 
         verify {
-            viewModel.loadPlaces()
+            viewModel.loadPlacesFor()
         }
     }
 }
