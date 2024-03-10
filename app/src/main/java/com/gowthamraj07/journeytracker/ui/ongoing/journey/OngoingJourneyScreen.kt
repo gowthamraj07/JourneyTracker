@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -15,6 +16,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -39,10 +41,31 @@ fun OngoingJourneyScreen(
     navigator: DestinationsNavigator
 ) {
     val coroutineScope = rememberCoroutineScope()
-    OngoingJourneyScreenContent(navigator, coroutineScope, viewModel.places)
+    val uiState = viewModel.places.collectAsState()
+
+    when(val currentState = uiState.value){
+        is OngoingJourneyUIState.Loading -> {
+            CenterLoadingIndicator()
+        }
+        is OngoingJourneyUIState.Data -> {
+            OngoingJourneyScreenContent(navigator, coroutineScope, currentState.places)
+        }
+    }
+
 
     LaunchedEffect(Unit) {
         viewModel.loadPlaces()
+    }
+}
+
+@Composable
+fun CenterLoadingIndicator() {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(color = MaterialTheme.colorScheme.surface)
+    ) {
+        CircularProgressIndicator()
     }
 }
 
