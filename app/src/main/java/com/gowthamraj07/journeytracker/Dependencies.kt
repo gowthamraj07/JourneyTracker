@@ -2,6 +2,7 @@ package com.gowthamraj07.journeytracker
 
 import androidx.room.Room
 import com.gowthamraj07.journeytracker.data.FlickrApi
+import com.gowthamraj07.journeytracker.data.FlickrResponseParser
 import com.gowthamraj07.journeytracker.data.TripDao
 import com.gowthamraj07.journeytracker.data.TripDatabase
 import com.gowthamraj07.journeytracker.data.TripsRepositoryImpl
@@ -30,8 +31,8 @@ val dependencies = module {
             .build()
             .create(FlickrApi::class.java)
     }
-
-    factory<TripsRepository> { TripsRepositoryImpl(get(), get()) }
+    factory { FlickrResponseParser() }
+    factory<TripsRepository> { TripsRepositoryImpl(get(), get(), get()) }
     factory { GetTripsUseCase(get()) }
     viewModel {
         TripsViewModel(get())
