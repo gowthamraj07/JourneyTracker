@@ -1,8 +1,10 @@
-package com.gowthamraj07.journeytracker.data
+package com.gowthamraj07.journeytracker.data.db.dao
 
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Transaction
+import com.gowthamraj07.journeytracker.data.db.entities.TripEntity
+import com.gowthamraj07.journeytracker.data.db.entities.TripsWithPlaces
 import kotlinx.coroutines.flow.Flow
 
 @Dao

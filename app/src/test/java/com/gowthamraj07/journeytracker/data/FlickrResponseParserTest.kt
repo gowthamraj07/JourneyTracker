@@ -2,6 +2,8 @@ package com.gowthamraj07.journeytracker.data
 
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
+import com.gowthamraj07.journeytracker.data.flikr.FlickrResponse
+import com.gowthamraj07.journeytracker.data.flikr.FlickrResponseParser
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 

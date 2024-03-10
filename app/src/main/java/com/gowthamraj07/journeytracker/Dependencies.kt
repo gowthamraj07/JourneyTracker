@@ -1,11 +1,11 @@
 package com.gowthamraj07.journeytracker
 
 import androidx.room.Room
-import com.gowthamraj07.journeytracker.data.FlickrApi
-import com.gowthamraj07.journeytracker.data.FlickrResponseParser
-import com.gowthamraj07.journeytracker.data.TripDao
-import com.gowthamraj07.journeytracker.data.TripDatabase
 import com.gowthamraj07.journeytracker.data.TripsRepositoryImpl
+import com.gowthamraj07.journeytracker.data.db.TripDatabase
+import com.gowthamraj07.journeytracker.data.db.dao.TripDao
+import com.gowthamraj07.journeytracker.data.flikr.FlickrApi
+import com.gowthamraj07.journeytracker.data.flikr.FlickrResponseParser
 import com.gowthamraj07.journeytracker.domain.repository.TripsRepository
 import com.gowthamraj07.journeytracker.domain.usecase.GetTripsUseCase
 import com.gowthamraj07.journeytracker.ui.ongoing.journey.OngoingJourneyViewModel

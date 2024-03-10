@@ -1,4 +1,4 @@
-package com.gowthamraj07.journeytracker.data
+package com.gowthamraj07.journeytracker.data.db.entities
 
 import androidx.room.Embedded
 import androidx.room.Relation

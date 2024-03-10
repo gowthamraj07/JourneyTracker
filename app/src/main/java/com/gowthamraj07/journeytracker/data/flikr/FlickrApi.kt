@@ -1,4 +1,4 @@
-package com.gowthamraj07.journeytracker.data
+package com.gowthamraj07.journeytracker.data.flikr
 
 import com.google.gson.JsonObject
 import retrofit2.http.GET
