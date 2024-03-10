@@ -1,10 +1,11 @@
 package com.gowthamraj07.journeytracker.domain.usecase
 
 import com.gowthamraj07.journeytracker.domain.Trip
+import com.gowthamraj07.journeytracker.domain.repository.TripsRepository
 import kotlinx.coroutines.flow.Flow
 
-class GetTripsUseCase {
+class GetTripsUseCase(private val tripsRepository: TripsRepository) {
     fun execute() : Flow<List<Trip>> {
-        TODO("Not yet implemented")
+        return tripsRepository.getTrips()
     }
 }
