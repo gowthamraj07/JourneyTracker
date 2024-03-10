@@ -1,8 +1,10 @@
 package com.gowthamraj07.journeytracker.data
 
+import com.google.gson.JsonObject
 import com.gowthamraj07.journeytracker.data.db.dao.PlaceDao
 import com.gowthamraj07.journeytracker.data.db.entities.PlaceEntity
 import com.gowthamraj07.journeytracker.data.flikr.FlickrApi
+import com.gowthamraj07.journeytracker.data.flikr.FlickrResponseParser
 import io.kotest.core.spec.style.StringSpec
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -22,7 +24,8 @@ class PlacesRepositoryImplTest: StringSpec({
 
     val placeDao = mockk<PlaceDao>(relaxed = true)
     val flickrApi = mockk<FlickrApi>(relaxed = true)
-    val placesRepository = PlacesRepositoryImpl(placeDao, flickrApi, testDispatcher)
+    val flickrResponseParser = mockk<FlickrResponseParser>(relaxed = true)
+    val placesRepository = PlacesRepositoryImpl(placeDao, flickrApi, flickrResponseParser, testDispatcher)
 
     beforeAny{
         Dispatchers.setMain(testDispatcher)
@@ -60,6 +63,25 @@ class PlacesRepositoryImplTest: StringSpec({
 
         coVerify {
             flickrApi.getLocationDetails(12.0, 13.0)
+        }
+    }
+
+    "pass the flickr json response to FlickrResponseParser" {
+        val tripId = 1
+        val placeEntity = PlaceEntity(
+            id = 1,
+            tripId = 1,
+            latitude = 12.0,
+            longitude = 13.0,
+        )
+        coEvery { placeDao.getPlacesByTrip(tripId) } returns flowOf(listOf(placeEntity))
+        val flickrJsonResponse = JsonObject()
+        coEvery { flickrApi.getLocationDetails(placeEntity.latitude, placeEntity.longitude) } returns flickrJsonResponse
+
+        placesRepository.loadPlacesFor(tripId)
+
+        coVerify {
+            flickrResponseParser.parse(flickrJsonResponse)
         }
     }
 })
