@@ -43,6 +43,6 @@ class FlickrResponseParserTest: StringSpec({
     }
 })
 
-private fun String.toJsonObject(): JsonObject {
+fun String.toJsonObject(): JsonObject {
     return JsonParser.parseString(this).asJsonObject
 }
