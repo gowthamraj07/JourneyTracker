@@ -8,5 +8,5 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface PlaceDao {
     @Query("SELECT * FROM places WHERE tripId = :tripId")
-    fun getPlacesByTrip(tripId: Long): Flow<List<PlaceEntity>>
+    fun getPlacesByTrip(tripId: Int): Flow<List<PlaceEntity>>
 }

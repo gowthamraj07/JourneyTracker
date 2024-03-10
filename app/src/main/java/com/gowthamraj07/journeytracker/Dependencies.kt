@@ -4,6 +4,7 @@ import androidx.room.Room
 import com.gowthamraj07.journeytracker.data.PlacesRepositoryImpl
 import com.gowthamraj07.journeytracker.data.TripsRepositoryImpl
 import com.gowthamraj07.journeytracker.data.db.TripDatabase
+import com.gowthamraj07.journeytracker.data.db.dao.PlaceDao
 import com.gowthamraj07.journeytracker.data.db.dao.TripDao
 import com.gowthamraj07.journeytracker.data.flikr.FlickrApi
 import com.gowthamraj07.journeytracker.data.flikr.FlickrResponseParser
@@ -41,7 +42,14 @@ val dependencies = module {
         TripsViewModel(get())
     }
 
-    factory<PlacesRepository> { PlacesRepositoryImpl() }
+    single<PlaceDao> {
+        Room.databaseBuilder(
+            androidApplication().applicationContext,
+            TripDatabase::class.java,
+            "trip_database"
+        ).build().placeDao()
+    }
+    factory<PlacesRepository> { PlacesRepositoryImpl(get()) }
     factory { LoadPlacesUseCase(get()) }
     viewModel {
         OngoingJourneyViewModel(get())
