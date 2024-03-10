@@ -23,7 +23,7 @@ class TripsViewModelTest : StringSpec({
     val testDispatcher = UnconfinedTestDispatcher()
 
     val getTripsUseCase = mockk<GetTripsUseCase>()
-    val tripsViewModel = TripsViewModel(getTripsUseCase)
+    val tripsViewModel = TripsViewModel(getTripsUseCase, testDispatcher)
 
     beforeAny {
         Dispatchers.setMain(testDispatcher)
