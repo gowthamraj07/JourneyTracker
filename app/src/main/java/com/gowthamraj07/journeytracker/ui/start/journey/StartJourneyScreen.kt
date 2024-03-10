@@ -81,7 +81,7 @@ private fun StartJourneyContent(paddingValues: PaddingValues, navigator: Destina
         Button(
             modifier = Modifier.align(Alignment.CenterHorizontally),
             onClick = {
-                navigator.navigate(OngoingJourneyScreenDestination)
+                navigator.navigate(OngoingJourneyScreenDestination(tripId = 0))
             }
         ) {
             Text(text = "Start Journey")

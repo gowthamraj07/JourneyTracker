@@ -19,6 +19,7 @@ class OngoingJourneyScreenKtTest {
         with(composeTestRule) {
             setContent {
                 OngoingJourneyScreen(
+                    tripId = 1,
                     viewModel = viewModel,
                     navigator = EmptyDestinationsNavigator
                 )
