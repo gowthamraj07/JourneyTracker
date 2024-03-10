@@ -8,6 +8,7 @@ import com.gowthamraj07.journeytracker.data.flikr.FlickrApi
 import com.gowthamraj07.journeytracker.data.flikr.FlickrResponseParser
 import com.gowthamraj07.journeytracker.domain.repository.TripsRepository
 import com.gowthamraj07.journeytracker.domain.usecase.GetTripsUseCase
+import com.gowthamraj07.journeytracker.domain.usecase.LoadPlacesUseCase
 import com.gowthamraj07.journeytracker.ui.ongoing.journey.OngoingJourneyViewModel
 import com.gowthamraj07.journeytracker.ui.trips.TripsViewModel
 import org.koin.android.ext.koin.androidApplication
@@ -38,7 +39,8 @@ val dependencies = module {
         TripsViewModel(get())
     }
 
+    factory { LoadPlacesUseCase() }
     viewModel {
-        OngoingJourneyViewModel()
+        OngoingJourneyViewModel(get())
     }
 }
