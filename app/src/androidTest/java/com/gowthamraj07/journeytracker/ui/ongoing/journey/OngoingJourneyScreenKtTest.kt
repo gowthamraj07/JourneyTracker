@@ -16,10 +16,11 @@ class OngoingJourneyScreenKtTest {
 
     @Test
     fun triggerViewModelMethod_toLoadPlaces() {
+        val tripId = 1
         with(composeTestRule) {
             setContent {
                 OngoingJourneyScreen(
-                    tripId = 1,
+                    tripId = tripId,
                     viewModel = viewModel,
                     navigator = EmptyDestinationsNavigator
                 )
@@ -27,7 +28,7 @@ class OngoingJourneyScreenKtTest {
         }
 
         verify {
-            viewModel.loadPlacesFor()
+            viewModel.loadPlacesFor(tripId)
         }
     }
 }

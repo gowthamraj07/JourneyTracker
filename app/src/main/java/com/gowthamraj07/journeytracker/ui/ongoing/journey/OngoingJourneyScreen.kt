@@ -55,7 +55,7 @@ fun OngoingJourneyScreen(
 
 
     LaunchedEffect(Unit) {
-        viewModel.loadPlacesFor()
+        viewModel.loadPlacesFor(tripId)
     }
 }
 

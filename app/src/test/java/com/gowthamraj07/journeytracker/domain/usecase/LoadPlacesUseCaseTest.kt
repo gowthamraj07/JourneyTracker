@@ -11,11 +11,11 @@ class LoadPlacesUseCaseTest : StringSpec({
     val loadPlacesUseCase = LoadPlacesUseCase(placesRepository)
 
     "call repository to load places" {
-        loadPlacesUseCase.execute()
+        val tripId = 1
+        loadPlacesUseCase.execute(tripId)
 
         coVerify {
-            placesRepository.loadPlaces()
+            placesRepository.loadPlacesFor(tripId)
         }
     }
-
 })

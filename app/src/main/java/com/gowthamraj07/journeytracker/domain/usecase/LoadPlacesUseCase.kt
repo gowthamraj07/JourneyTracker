@@ -6,8 +6,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 
 class LoadPlacesUseCase(private val placesRepository: PlacesRepository) {
-    suspend fun execute(): Flow<List<Place>> {
-        placesRepository.loadPlaces()
+    suspend fun execute(tripId: Int): Flow<List<Place>> {
+        placesRepository.loadPlacesFor(tripId)
         return flowOf(emptyList())
     }
 
