@@ -18,7 +18,11 @@ class TripsRepositoryImplTest : StringSpec({
         coEvery { getLocationDetails(any(), any()) } returns JsonObject()
     }
     val flickrResponseParser = mockk<FlickrResponseParser>{
-        every { parse(any()) } returns Unit
+        every { parse(any()) } returns FlickrResponse(
+            id = "123",
+            serverId = "123",
+            secret = "123"
+        )
     }
 
 
