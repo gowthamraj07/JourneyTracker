@@ -1,11 +1,13 @@
 package com.gowthamraj07.journeytracker
 
 import androidx.room.Room
+import com.gowthamraj07.journeytracker.data.PlacesRepositoryImpl
 import com.gowthamraj07.journeytracker.data.TripsRepositoryImpl
 import com.gowthamraj07.journeytracker.data.db.TripDatabase
 import com.gowthamraj07.journeytracker.data.db.dao.TripDao
 import com.gowthamraj07.journeytracker.data.flikr.FlickrApi
 import com.gowthamraj07.journeytracker.data.flikr.FlickrResponseParser
+import com.gowthamraj07.journeytracker.domain.repository.PlacesRepository
 import com.gowthamraj07.journeytracker.domain.repository.TripsRepository
 import com.gowthamraj07.journeytracker.domain.usecase.GetTripsUseCase
 import com.gowthamraj07.journeytracker.domain.usecase.LoadPlacesUseCase
@@ -39,7 +41,8 @@ val dependencies = module {
         TripsViewModel(get())
     }
 
-    factory { LoadPlacesUseCase() }
+    factory<PlacesRepository> { PlacesRepositoryImpl() }
+    factory { LoadPlacesUseCase(get()) }
     viewModel {
         OngoingJourneyViewModel(get())
     }
