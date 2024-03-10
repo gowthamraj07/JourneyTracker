@@ -6,8 +6,8 @@ import com.gowthamraj07.journeytracker.domain.usecase.GetTripsUseCase
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.mockk
-import io.mockk.verify
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -37,7 +37,7 @@ class TripsViewModelTest : StringSpec({
     "should trigger the use case to load trips" {
         tripsViewModel.loadTrips()
 
-        verify { getTripsUseCase.execute() }
+        coVerify { getTripsUseCase.execute() }
     }
 
     "should emit state as Empty when there are no trips" {

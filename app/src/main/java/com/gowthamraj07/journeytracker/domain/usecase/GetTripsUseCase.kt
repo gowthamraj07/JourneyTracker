@@ -5,7 +5,7 @@ import com.gowthamraj07.journeytracker.domain.repository.TripsRepository
 import kotlinx.coroutines.flow.Flow
 
 class GetTripsUseCase(private val tripsRepository: TripsRepository) {
-    fun execute() : Flow<List<Trip>> {
+    suspend fun execute() : Flow<List<Trip>> {
         return tripsRepository.getTrips()
     }
 }
