@@ -6,5 +6,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 
 class OngoingJourneyViewModel : ViewModel() {
+    fun loadPlaces() {
+        TODO("Not yet implemented")
+    }
+
     val places: Flow<List<Place>> = flowOf(emptyList())
 }
