@@ -4,17 +4,20 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gowthamraj07.journeytracker.domain.Place
 import com.gowthamraj07.journeytracker.domain.usecase.LoadPlacesUseCase
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
-class OngoingJourneyViewModel(private val loadPlacesUseCase: LoadPlacesUseCase) : ViewModel() {
+class OngoingJourneyViewModel(private val loadPlacesUseCase: LoadPlacesUseCase, private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO) : ViewModel() {
     fun loadPlaces() {
         viewModelScope.launch {
             val placesFlow = loadPlacesUseCase.execute()
-            placesFlow.map {
+            placesFlow.flowOn(ioDispatcher).map {
                 OngoingJourneyUIState.Data(placesFlow)
             }.collect { newState ->
                 _places.value = newState

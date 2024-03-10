@@ -18,11 +18,11 @@ import kotlinx.coroutines.test.setMain
 
 @OptIn(ExperimentalCoroutinesApi::class, DelicateCoroutinesApi::class)
 class OngoingJourneyViewModelTest : StringSpec({
+    val testDispatcher = UnconfinedTestDispatcher()
 
     val loadPlacesUseCase = mockk<LoadPlacesUseCase>(relaxed = true)
-    val viewModel = OngoingJourneyViewModel(loadPlacesUseCase)
+    val viewModel = OngoingJourneyViewModel(loadPlacesUseCase, testDispatcher)
 
-    val testDispatcher = UnconfinedTestDispatcher()
 
     beforeAny {
         Dispatchers.setMain(testDispatcher)
