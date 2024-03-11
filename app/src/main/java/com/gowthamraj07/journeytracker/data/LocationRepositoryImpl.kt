@@ -14,6 +14,8 @@ import com.gowthamraj07.journeytracker.data.db.dao.PlaceDao
 import com.gowthamraj07.journeytracker.data.db.dao.TripDao
 import com.gowthamraj07.journeytracker.data.db.entities.PlaceEntity
 import com.gowthamraj07.journeytracker.data.db.entities.TripEntity
+import com.gowthamraj07.journeytracker.data.flikr.FlickrApi
+import com.gowthamraj07.journeytracker.data.flikr.FlickrResponseParser
 import com.gowthamraj07.journeytracker.domain.repository.LocationRepository
 import com.gowthamraj07.journeytracker.services.TripsServiceConnection
 import kotlinx.coroutines.CoroutineScope
@@ -24,6 +26,8 @@ class LocationRepositoryImpl(
     private val placeDao: PlaceDao,
     private val tripDao: TripDao,
     private val service: TripsServiceConnection,
+    private val flickrApi: FlickrApi,
+    private val flickrResponseParser: FlickrResponseParser,
     private val context: Context
 ): LocationRepository {
 
@@ -62,7 +66,7 @@ class LocationRepositoryImpl(
         fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
     }
 
-    private fun save(location: Location) {
+    private suspend fun save(location: Location) {
         if (tripId == 0L) {
             saveTripAndPlace(location)
         } else {
@@ -70,7 +74,7 @@ class LocationRepositoryImpl(
         }
     }
 
-    private fun saveTripAndPlace(location: Location) {
+    private suspend fun saveTripAndPlace(location: Location) {
         tripId = tripDao.insert(
             TripEntity(
                 name = "Trip $tripId"
@@ -84,14 +88,22 @@ class LocationRepositoryImpl(
         savePlace(location)
     }
 
-    private fun savePlace(location: Location) {
+    private suspend fun savePlace(location: Location) {
         Log.d("Gowtham", "savePlace: saving new place")
+
+        val flickrJsonResponse =
+            flickrApi.getLocationDetails(location.latitude, location.longitude)
+        val flickrResponse = flickrResponseParser.parse(flickrJsonResponse)
+        val imageUrl =
+            "https://live.staticflickr.com/${flickrResponse.serverId}/${flickrResponse.id}_${flickrResponse.secret}.jpg"
+
 
         placeDao.insert(
             PlaceEntity(
                 tripId = tripId,
                 latitude = location.latitude,
-                longitude = location.longitude
+                longitude = location.longitude,
+                imageUrl = imageUrl
             )
         )
     }

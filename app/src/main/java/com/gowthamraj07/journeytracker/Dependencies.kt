@@ -55,14 +55,14 @@ val dependencies = module {
             "trip_database"
         ).build().placeDao()
     }
-    factory<PlacesRepository> { PlacesRepositoryImpl(get(), get(), get()) }
+    factory<PlacesRepository> { PlacesRepositoryImpl(get()) }
     factory { LoadPlacesUseCase(get()) }
     viewModel {
         OngoingJourneyViewModel(get())
     }
 
     single { TripsServiceConnection() }
-    factory<LocationRepository> { LocationRepositoryImpl(get(), get(), get(), androidApplication()) }
+    factory<LocationRepository> { LocationRepositoryImpl(get(), get(), get(), get(), get(), androidApplication()) }
     viewModel {
         StartJourneyViewModel(get())
     }
