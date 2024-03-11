@@ -41,7 +41,9 @@ class LocationRepositoryImpl(
 
     override suspend fun stopCapturingLocations() {
         isServiceRunning = false
-        fusedLocationClient.removeLocationUpdates(locationCallback)
+        if(::fusedLocationClient.isInitialized) {
+            fusedLocationClient.removeLocationUpdates(locationCallback)
+        }
     }
 
     override suspend fun startCapturingLocations() {

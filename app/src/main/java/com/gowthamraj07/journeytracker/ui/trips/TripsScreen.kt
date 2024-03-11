@@ -2,6 +2,7 @@ package com.gowthamraj07.journeytracker.ui.trips
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
@@ -41,6 +42,7 @@ import coil.request.ImageRequest
 import com.gowthamraj07.journeytracker.R
 import com.gowthamraj07.journeytracker.domain.Trip
 import com.gowthamraj07.journeytracker.domain.TripImage
+import com.gowthamraj07.journeytracker.ui.destinations.OngoingJourneyScreenDestination
 import com.gowthamraj07.journeytracker.ui.destinations.StartJourneyScreenDestination
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
@@ -83,7 +85,7 @@ private fun TripsScreenContent(
             val uiState = uiStateFlow.collectAsState()
             when (uiState.value) {
                 is TripsUiState.Empty -> EmptyTripsState()
-                is TripsUiState.Data -> ListOfTripsState((uiState.value as TripsUiState.Data).trips)
+                is TripsUiState.Data -> ListOfTripsState((uiState.value as TripsUiState.Data).trips, navigator)
             }
         }
     }
@@ -114,22 +116,27 @@ private fun TopBar() {
 }
 
 @Composable
-fun ListOfTripsState(trips: Flow<List<Trip>>) {
+fun ListOfTripsState(trips: Flow<List<Trip>>, navigator: DestinationsNavigator) {
     val tripsList: State<List<Trip>> = trips.collectAsState(initial = emptyList())
 
     LazyColumn {
         items(tripsList.value) { trip ->
-            TripDetails(trip)
+            TripDetails(trip) {
+                navigator.navigate(OngoingJourneyScreenDestination(trip.id))
+            }
         }
     }
 }
 
 @Composable
-private fun TripDetails(trip: Trip) {
+private fun TripDetails(trip: Trip, onClickListener: () -> Unit) {
     Card(
         modifier = Modifier
             .padding(top = 16.dp, start = 16.dp, end = 16.dp)
             .heightIn(max = 200.dp)
+            .clickable {
+                onClickListener()
+            }
     ) {
         Box {
             CardBackgroundImage(trip)
