@@ -34,6 +34,8 @@ class TripsServices : LifecycleService() {
 
     private val tripServiceBinder = TripServiceBinder()
 
+    private val _isRunning = MutableStateFlow(false)
+    var isRunning: Flow<Boolean> = _isRunning
     private val _tripId = MutableStateFlow<Long>(0)
     val tripId: Flow<Long> = _tripId
 
@@ -53,9 +55,11 @@ class TripsServices : LifecycleService() {
         super.onStartCommand(intent, flags, startId)
 
         if (intent?.action == ACTION_STOP_UPDATES) {
+            _isRunning.update { false }
             stopLocationUpdates()
             stopSelf()
         } else {
+            _isRunning.update { true }
             startShowingNotifications()
 
             lifecycleScope.launch {

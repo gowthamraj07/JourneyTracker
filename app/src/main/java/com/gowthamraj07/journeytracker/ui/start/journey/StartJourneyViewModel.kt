@@ -12,14 +12,21 @@ import kotlinx.coroutines.launch
 
 class StartJourneyViewModel(
     private val tripsServiceConnection: TripsServiceConnection
-): ViewModel() {
+) : ViewModel() {
     fun onScreenLoaded(navigator: DestinationsNavigator) {
         viewModelScope.launch {
-            tripsServiceConnection.service?.tripId?.flowOn(Dispatchers.Default)?.collectLatest {
-                if(it != 0L) {
-                    navigator.navigate(OngoingJourneyScreenDestination(tripId = it))
+
+            tripsServiceConnection.service?.isRunning?.flowOn(Dispatchers.Default)
+                ?.collectLatest { isRunning ->
+                    if (isRunning) {
+                        tripsServiceConnection.service?.tripId?.flowOn(Dispatchers.Default)
+                            ?.collectLatest { tripId ->
+                                if (tripId != 0L) {
+                                    navigator.navigate(OngoingJourneyScreenDestination(tripId = tripId))
+                                }
+                            }
+                    }
                 }
-            }
         }
     }
 }
