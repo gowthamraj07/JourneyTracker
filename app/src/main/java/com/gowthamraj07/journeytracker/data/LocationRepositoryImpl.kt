@@ -23,6 +23,8 @@ import com.gowthamraj07.journeytracker.services.TripsServiceConnection
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class LocationRepositoryImpl(
     private val placeDao: PlaceDao,
@@ -116,9 +118,10 @@ class LocationRepositoryImpl(
     }
 
     private suspend fun saveTripAndPlace(location: Location) {
+        val dateTime: String = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.ENGLISH).format(System.currentTimeMillis())
         tripId = tripDao.insert(
             TripEntity(
-                name = "Trip $tripId"
+                name = "Trip on $dateTime"
             )
         )
 
