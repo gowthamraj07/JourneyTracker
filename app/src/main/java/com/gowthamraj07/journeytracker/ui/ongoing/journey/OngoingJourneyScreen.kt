@@ -1,10 +1,13 @@
 package com.gowthamraj07.journeytracker.ui.ongoing.journey
 
 import android.util.Log
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -17,22 +20,25 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
+import com.gowthamraj07.journeytracker.R
 import com.gowthamraj07.journeytracker.domain.Place
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 @Destination
@@ -45,12 +51,13 @@ fun OngoingJourneyScreen(
     val coroutineScope = rememberCoroutineScope()
     val uiState = viewModel.places.collectAsState()
 
-    when(val currentState = uiState.value){
+    when (val currentState = uiState.value) {
         is OngoingJourneyUIState.Loading -> {
             CenterLoadingIndicator()
         }
+
         is OngoingJourneyUIState.Data -> {
-            OngoingJourneyScreenContent(navigator, coroutineScope, currentState.places)
+            OngoingJourneyScreenContent(navigator, currentState.places)
         }
     }
 
@@ -67,14 +74,13 @@ fun CenterLoadingIndicator() {
             .fillMaxSize()
             .background(color = MaterialTheme.colorScheme.surface)
     ) {
-        CircularProgressIndicator()
+        CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
     }
 }
 
 @Composable
 private fun OngoingJourneyScreenContent(
     navigator: DestinationsNavigator,
-    coroutineScope: CoroutineScope,
     places: Flow<List<Place>>
 ) {
     Scaffold(
@@ -84,16 +90,19 @@ private fun OngoingJourneyScreenContent(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(16.dp)
                 .background(color = MaterialTheme.colorScheme.surface)
         ) {
+            val listOfPlace = places.collectAsState(initial = emptyList())
             LazyColumn {
-                coroutineScope.launch {
-                    places.collectLatest {
-                        items(it) { place ->
-                            PlaceDetails(place)
-                        }
+
+                item {
+                    SideEffect {
+                        Log.d("Gowtham", "OngoingJourneyScreenContent: ************** ")
                     }
+                }
+
+                items(listOfPlace.value) { place ->
+                    PlaceDetails(place)
                 }
             }
         }
@@ -129,13 +138,50 @@ private fun TopBar(navigator: DestinationsNavigator) {
 
 @Composable
 fun PlaceDetails(place: Place) {
-    Card(modifier = Modifier.padding(top = 16.dp, start = 16.dp, end = 16.dp)) {
-        AsyncImage(model = place.imageUrl, contentDescription = null)
+    Card(
+        modifier = Modifier
+            .padding(top = 16.dp, start = 16.dp, end = 16.dp)
+            .heightIn(max = 200.dp)
+    ) {
+
+        SideEffect {
+            Log.d("Gowtham", "PlaceDetails: imageUrl ${place.imageUrl}")
+        }
+
+        Box {
+            val painter = rememberAsyncImagePainter(
+                ImageRequest.Builder(LocalContext.current)
+                    .data(data = place.imageUrl)
+                    .apply(block = {
+                        placeholder(R.drawable.bouncing_circles)
+                        error(R.drawable.error_loading_image)
+                    }).build()
+            )
+
+            Image(
+                painter = painter,
+                contentDescription = "Loaded image",
+                modifier = Modifier.fillMaxWidth(),
+                contentScale = ContentScale.Crop,
+            )
+        }
     }
 }
 
 @Preview
 @Composable
 fun OngoingJourneyPreview() {
-    OngoingJourneyScreenContent(places = flowOf(value = emptyList()), navigator = EmptyDestinationsNavigator, coroutineScope = rememberCoroutineScope())
+    OngoingJourneyScreenContent(
+        navigator = EmptyDestinationsNavigator, places = flowOf(
+            value = listOf(
+                Place(
+                    id = 0,
+                    tripId = 1,
+                    latitude = 12.0,
+                    longitude = 13.0,
+                    imageUrl = ""
+                )
+            )
+        )
+    )
 }
