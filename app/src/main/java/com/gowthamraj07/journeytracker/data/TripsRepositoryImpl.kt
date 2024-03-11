@@ -11,8 +11,8 @@ class TripsRepositoryImpl(
     private val tripDao: TripDao
 ) : TripsRepository {
     override suspend fun getTrips(): Flow<List<Trip>> {
-        return tripDao.getTripsWithPlaces().map {
-            it.filter { it.places.isNotEmpty() }.map { tripEntity ->
+        return tripDao.getTripsWithPlaces().map { list ->
+            list.filter { it.places.isNotEmpty() }.map { tripEntity ->
                 Trip(
                     id = tripEntity.trip.id,
                     name = tripEntity.trip.name,
