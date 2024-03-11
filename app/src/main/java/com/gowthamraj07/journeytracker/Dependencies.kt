@@ -42,7 +42,7 @@ val dependencies = module {
             .create(FlickrApi::class.java)
     }
     factory { FlickrResponseParser() }
-    factory<TripsRepository> { TripsRepositoryImpl(get(), get(), get()) }
+    factory<TripsRepository> { TripsRepositoryImpl(get()) }
     factory { GetTripsUseCase(get()) }
     viewModel {
         TripsViewModel(get())
