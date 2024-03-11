@@ -28,8 +28,9 @@ class LocationRepositoryImpl(
     private val service: TripsServiceConnection,
     private val flickrApi: FlickrApi,
     private val flickrResponseParser: FlickrResponseParser,
+    private val distanceCalculator: DistanceCalculator,
     private val context: Context
-): LocationRepository {
+) : LocationRepository {
 
     private var isServiceRunning = false
     private var tripId: Long = 0
@@ -37,11 +38,13 @@ class LocationRepositoryImpl(
     private lateinit var locationCallback: LocationCallback
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
+    private var lastSavedLocation: Location? = null
+
     override fun isServiceNeeded(): Boolean = isServiceRunning
 
     override suspend fun stopCapturingLocations() {
         isServiceRunning = false
-        if(::fusedLocationClient.isInitialized) {
+        if (::fusedLocationClient.isInitialized) {
             fusedLocationClient.removeLocationUpdates(locationCallback)
         }
     }
@@ -57,7 +60,9 @@ class LocationRepositoryImpl(
             override fun onLocationResult(locationResult: LocationResult) {
                 for (location in locationResult.locations) {
                     CoroutineScope(Dispatchers.IO).launch {
-                        save(location)
+                        lastSavedLocation = location
+                        saveIfNewLocationIsMoreThan100MetersFromLastSavedLocation(location)
+
                     }
                 }
             }
@@ -65,7 +70,27 @@ class LocationRepositoryImpl(
 
         val locationRequest = LocationRequest.Builder(10000).build()
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
-        fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
+        fusedLocationClient.requestLocationUpdates(
+            locationRequest,
+            locationCallback,
+            Looper.getMainLooper()
+        )
+    }
+
+    private suspend fun saveIfNewLocationIsMoreThan100MetersFromLastSavedLocation(location: Location) {
+        lastSavedLocation?.let { lastLocation ->
+
+            val distanceOver100Meters = distanceCalculator.isDistanceOver100Meters(
+                lastLocation.latitude,
+                lastLocation.longitude,
+                location.latitude,
+                location.longitude
+            )
+
+            if (distanceOver100Meters) {
+                save(location)
+            }
+        }
     }
 
     private suspend fun save(location: Location) {
@@ -83,7 +108,10 @@ class LocationRepositoryImpl(
             )
         )
 
-        Log.d("Gowtham", "startCapturingLocations: notifyObserversWithNewTripId with trip id ($tripId)")
+        Log.d(
+            "Gowtham",
+            "startCapturingLocations: notifyObserversWithNewTripId with trip id ($tripId)"
+        )
         service.service?.notifyObserversWithNewTripId(tripId)
 
         Log.d("Gowtham", "saveTripAndPlace: trip with new id $tripId")

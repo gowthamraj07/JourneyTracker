@@ -1,6 +1,7 @@
 package com.gowthamraj07.journeytracker
 
 import androidx.room.Room
+import com.gowthamraj07.journeytracker.data.DistanceCalculator
 import com.gowthamraj07.journeytracker.data.LocationRepositoryImpl
 import com.gowthamraj07.journeytracker.data.PlacesRepositoryImpl
 import com.gowthamraj07.journeytracker.data.TripsRepositoryImpl
@@ -62,8 +63,10 @@ val dependencies = module {
     }
 
     single { TripsServiceConnection() }
-    factory<LocationRepository> { LocationRepositoryImpl(get(), get(), get(), get(), get(), androidApplication()) }
+    factory<LocationRepository> { LocationRepositoryImpl(get(), get(), get(), get(), get(), get(), androidApplication()) }
     viewModel {
         StartJourneyViewModel(get())
     }
+
+    factory { DistanceCalculator() }
 }
