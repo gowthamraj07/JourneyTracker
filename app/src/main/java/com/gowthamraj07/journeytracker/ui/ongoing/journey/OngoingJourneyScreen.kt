@@ -22,7 +22,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -48,7 +47,6 @@ fun OngoingJourneyScreen(
     viewModel: OngoingJourneyViewModel = koinViewModel(),
     navigator: DestinationsNavigator
 ) {
-    val coroutineScope = rememberCoroutineScope()
     val uiState = viewModel.places.collectAsState()
 
     when (val currentState = uiState.value) {
