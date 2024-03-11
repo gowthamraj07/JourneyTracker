@@ -1,58 +1,137 @@
 package com.gowthamraj07.journeytracker.services
 
-import android.annotation.SuppressLint
-import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.app.Service
+import android.app.PendingIntent
+import android.content.ComponentName
 import android.content.Intent
-import android.location.Location
+import android.content.ServiceConnection
+import android.os.Binder
 import android.os.IBinder
-import android.os.Looper
+import androidx.core.app.NotificationCompat
+import androidx.lifecycle.LifecycleService
+import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.location.LocationCallback
-import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.gowthamraj07.journeytracker.R
-import com.gowthamraj07.journeytracker.data.db.dao.PlaceDao
-import com.gowthamraj07.journeytracker.data.db.dao.TripDao
-import com.gowthamraj07.journeytracker.data.db.entities.PlaceEntity
-import com.gowthamraj07.journeytracker.data.db.entities.TripEntity
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import com.gowthamraj07.journeytracker.domain.repository.LocationRepository
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 
-class TripsServices : Service() {
-
-    private val tripDao: TripDao by inject()
-    private val placeDao: PlaceDao by inject()
-    private var tripId: Long = 0
-
+class TripsServices : LifecycleService() {
+    private val locationRepository: LocationRepository by inject()
     private lateinit var locationCallback: LocationCallback
 
-    private val channelId = "TripsServiceChannel"
+    private val tripServiceBinder = TripServiceBinder()
+    private var observers = 0
+    private var isAlreadyInForeGround = false
 
-    override fun onBind(p0: Intent?): IBinder? {
-        return null
+    private val _tripId = MutableStateFlow<Long>(0)
+    val tripId: Flow<Long> = _tripId
+
+    override fun onBind(intent: Intent): IBinder {
+        super.onBind(intent)
+        handleBinding()
+        return tripServiceBinder
     }
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        createNotificationChannel()
-        val notification: Notification = Notification.Builder(this, channelId)
+    override fun onRebind(intent: Intent?) {
+        super.onRebind(intent)
+        handleBinding()
+    }
+
+    private fun handleBinding() {
+        observers++
+//        startService(Intent(this, this::class.java))
+    }
+
+    override fun onUnbind(intent: Intent?): Boolean {
+        observers--
+        lifecycleScope.launch {
+            delay(MIN_DELAY_TO_UNBIND)
+            handleUnbind()
+        }
+        return true
+    }
+
+    private fun handleUnbind() {
+        if (observers == 0 && locationRepository.isServiceNeeded()) {
+            startServiceInForeground()
+        }
+    }
+
+    private fun startServiceInForeground() {
+        if(!isAlreadyInForeGround) {
+            isAlreadyInForeGround = true
+            startShowingNotifications()
+        }
+    }
+
+    private fun startShowingNotifications() {
+        // Create the NotificationChannel
+        val notificationChannel = NotificationChannel(
+            NOTIFICATION_CHANNEL_ID,
+            "Trips Service Channel",
+            NotificationManager.IMPORTANCE_DEFAULT
+        )
+        val manager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        manager.createNotificationChannel(notificationChannel)
+
+        // Create the notification
+        val pendingIntent = getPendingIntentToOpenTheAppOnClickingNotification()
+        val stopIntent = getPendingIntentToStopTheService()
+        val notification = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
             .setContentTitle("Track my trip")
-            .setContentText("Tracking...")
+            .setContentText("Tracking your trip")
+            .setContentIntent(pendingIntent)
             .setSmallIcon(R.drawable.ic_notification)
-            // Add more notification configuration as needed
+            .addAction(R.drawable.ic_delete, "stop", stopIntent)
+            .setOngoing(true)
+            .setCategory(NotificationCompat.CATEGORY_SERVICE)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
             .build()
 
-        startForeground(1, notification)
+        startForeground(NOTIFICATION_ID, notification)
+    }
 
-        CoroutineScope(Dispatchers.IO).launch {
-            captureCurrentLocation()
+    private fun getPendingIntentToStopTheService(): PendingIntent? = PendingIntent.getService(
+        this,
+        0,
+        Intent(this, this::class.java).setAction(ACTION_STOP_UPDATES),
+        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+    )
+
+    private fun getPendingIntentToOpenTheAppOnClickingNotification(): PendingIntent? = PendingIntent.getActivity(
+        this,
+        0,
+        packageManager.getLaunchIntentForPackage(this.packageName),
+        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+    )
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        super.onStartCommand(intent, flags, startId)
+
+        if (intent?.action == ACTION_STOP_UPDATES) {
+            stopLocationUpdates()
+            stopSelf()
         }
 
-        return START_NOT_STICKY
+        lifecycleScope.launch {
+            locationRepository.startCapturingLocations()
+        }
+
+        return START_STICKY
+    }
+
+    private fun stopLocationUpdates() {
+        lifecycleScope.launch {
+            locationRepository.stopCapturingLocations()
+        }
     }
 
     override fun stopService(name: Intent?): Boolean {
@@ -65,55 +144,39 @@ class TripsServices : Service() {
         fusedLocationClient.removeLocationUpdates(locationCallback)
     }
 
-    @SuppressLint("MissingPermission")
-    private suspend fun captureCurrentLocation() {
-        locationCallback = object : LocationCallback() {
-            override fun onLocationResult(locationResult: LocationResult) {
-                for (location in locationResult.locations) {
-                    CoroutineScope(Dispatchers.IO).launch {
-                        save(location)
-                    }
-                }
-            }
-        }
-
-        val locationRequest = LocationRequest.Builder(10000).build()
-        val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-        fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
-    }
-
-    private suspend fun save(location: Location) {
-        if (tripId == 0L) {
-            tripId = tripDao.insert(
-                TripEntity(
-                    name = "Trip $tripId"
-                )
-            )
-            placeDao.insert(
-                PlaceEntity(
-                    tripId = tripId,
-                    latitude = location.latitude,
-                    longitude = location.longitude
-                )
-            )
-        } else {
-            placeDao.insert(
-                PlaceEntity(
-                    tripId = tripId,
-                    latitude = location.latitude,
-                    longitude = location.longitude
-                )
-            )
+    fun notifyObserversWithNewTripId(tripId: Long) {
+        _tripId.update {
+            tripId
         }
     }
 
-    private fun createNotificationChannel() {
-        val serviceChannel = NotificationChannel(
-            channelId,
-            "Foreground Service Channel",
-            NotificationManager.IMPORTANCE_DEFAULT
-        )
-        val manager = getSystemService(NotificationManager::class.java)
-        manager.createNotificationChannel(serviceChannel)
+    internal inner class TripServiceBinder : Binder() {
+        fun getService(): TripsServices {
+            return this@TripsServices
+        }
+    }
+
+    companion object {
+        const val MIN_DELAY_TO_UNBIND = 2000L
+        const val ACTION_STOP_UPDATES = "STOP_SERVICE"
+        const val NOTIFICATION_CHANNEL_ID = "LocationUpdates"
+        const val NOTIFICATION_ID = 1
     }
 }
+
+class TripsServiceConnection: ServiceConnection {
+
+    var service: TripsServices? = null
+        private set
+
+    override fun onServiceConnected(name: ComponentName?, binder: IBinder?) {
+        service = (binder as TripsServices.TripServiceBinder).getService()
+    }
+
+    override fun onServiceDisconnected(name: ComponentName?) {
+        service = null
+    }
+
+}
+
+

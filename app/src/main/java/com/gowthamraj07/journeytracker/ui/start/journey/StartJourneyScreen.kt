@@ -22,6 +22,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -36,15 +37,16 @@ import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.PermissionStatus
 import com.google.accompanist.permissions.rememberPermissionState
 import com.gowthamraj07.journeytracker.services.TripsServices
-import com.gowthamraj07.journeytracker.ui.destinations.OngoingJourneyScreenDestination
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
+import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Destination
 @Composable
 fun StartJourneyScreen(
+    viewModel: StartJourneyViewModel = koinViewModel(),
     navigator: DestinationsNavigator
 ) {
 
@@ -69,7 +71,11 @@ fun StartJourneyScreen(
             )
         }
     ) { paddingValues ->
-        StartJourneyContent(paddingValues, navigator)
+        StartJourneyContent(paddingValues)
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.onScreenLoaded(navigator)
     }
 }
 
@@ -77,14 +83,15 @@ fun StartJourneyScreen(
 @Composable
 fun HandleLocationPermission() {
     val locationPermissionState = rememberPermissionState(Manifest.permission.ACCESS_FINE_LOCATION)
-    when(locationPermissionState.status) {
+    when (locationPermissionState.status) {
         is PermissionStatus.Denied -> {
-            if((locationPermissionState.status as PermissionStatus.Denied).shouldShowRationale) {
+            if ((locationPermissionState.status as PermissionStatus.Denied).shouldShowRationale) {
                 ShowDialogToOpenSettingsScreenToEnablePermission()
             } else {
                 ShowDialogExplainWhyPermissionIsNeeded(locationPermissionState)
             }
         }
+
         PermissionStatus.Granted -> {
             // Do nothing
         }
@@ -158,7 +165,7 @@ fun ShowDialogExplainWhyPermissionIsNeeded(locationPermissionState: PermissionSt
 }
 
 @Composable
-private fun StartJourneyContent(paddingValues: PaddingValues, navigator: DestinationsNavigator) {
+private fun StartJourneyContent(paddingValues: PaddingValues) {
     val context = LocalContext.current
     Column(
         modifier = Modifier
@@ -181,7 +188,6 @@ private fun StartJourneyContent(paddingValues: PaddingValues, navigator: Destina
             modifier = Modifier.align(Alignment.CenterHorizontally),
             onClick = {
                 context.startForegroundService(Intent(context, TripsServices::class.java))
-                navigator.navigate(OngoingJourneyScreenDestination(tripId = 0))
             }
         ) {
             Text(text = "Start Journey")

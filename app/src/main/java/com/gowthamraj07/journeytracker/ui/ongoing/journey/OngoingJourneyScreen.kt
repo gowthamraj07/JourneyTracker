@@ -1,5 +1,6 @@
 package com.gowthamraj07.journeytracker.ui.ongoing.journey
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -53,8 +54,8 @@ fun OngoingJourneyScreen(
         }
     }
 
-
     LaunchedEffect(Unit) {
+        Log.d("Gowtham", "Starting OngoingJourneyScreen for tripId $tripId")
         viewModel.loadPlacesFor(tripId)
     }
 }

@@ -16,7 +16,7 @@ class TripsRepositoryImpl(
 ) : TripsRepository {
     override suspend fun getTrips(): Flow<List<Trip>> {
         return tripDao.getTripsWithPlaces().map {
-            it.map { tripEntity ->
+            it.filter { it.places.isNotEmpty() }.map { tripEntity ->
                 val place = tripEntity.places.first()
                 val flickrJsonResponse =
                     flickrApi.getLocationDetails(place.latitude, place.longitude)
