@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class OngoingJourneyViewModel(private val loadPlacesUseCase: LoadPlacesUseCase, private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO) : ViewModel() {
-    fun loadPlacesFor(tripId: Int) {
+    fun loadPlacesFor(tripId: Long) {
         viewModelScope.launch {
             val placesFlow = loadPlacesUseCase.execute(tripId)
             placesFlow.flowOn(ioDispatcher).map {

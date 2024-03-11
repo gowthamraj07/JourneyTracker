@@ -17,7 +17,7 @@ class PlacesRepositoryImpl(
     private val flickrResponseParser: FlickrResponseParser,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : PlacesRepository {
-    override suspend fun loadPlacesFor(tripId: Int): Flow<List<Place>> {
+    override suspend fun loadPlacesFor(tripId: Long): Flow<List<Place>> {
         return placeDao.getPlacesByTrip(tripId).flowOn(ioDispatcher).map { places ->
             places.map { place ->
                 val flickrJsonResponse =

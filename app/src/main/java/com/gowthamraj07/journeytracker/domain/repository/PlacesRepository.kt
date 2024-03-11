@@ -5,5 +5,5 @@ import kotlinx.coroutines.flow.Flow
 
 
 interface PlacesRepository {
-    suspend fun loadPlacesFor(tripId: Int): Flow<List<Place>>
+    suspend fun loadPlacesFor(tripId: Long): Flow<List<Place>>
 }

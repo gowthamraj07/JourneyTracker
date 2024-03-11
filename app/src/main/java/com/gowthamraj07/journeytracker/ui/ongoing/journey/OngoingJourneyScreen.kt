@@ -37,7 +37,7 @@ import org.koin.androidx.compose.koinViewModel
 @Destination
 @Composable
 fun OngoingJourneyScreen(
-    tripId: Int,
+    tripId: Long,
     viewModel: OngoingJourneyViewModel = koinViewModel(),
     navigator: DestinationsNavigator
 ) {
