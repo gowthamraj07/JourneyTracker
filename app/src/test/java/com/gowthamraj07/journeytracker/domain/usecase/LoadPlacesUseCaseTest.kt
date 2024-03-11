@@ -15,7 +15,7 @@ class LoadPlacesUseCaseTest : StringSpec({
     val loadPlacesUseCase = LoadPlacesUseCase(placesRepository)
 
     "call repository to load places" {
-        val tripId = 1
+        val tripId = 1L
         loadPlacesUseCase.execute(tripId)
 
         coVerify {
@@ -25,7 +25,7 @@ class LoadPlacesUseCaseTest : StringSpec({
 
     "return places from repository" {
         // Arrange
-        val tripId = 1
+        val tripId = 1L
         val placesFlow = flowOf(
             listOf(
                 Place(

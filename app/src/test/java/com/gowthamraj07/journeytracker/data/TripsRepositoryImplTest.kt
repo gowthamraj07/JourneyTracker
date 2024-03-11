@@ -69,7 +69,13 @@ class TripsRepositoryImplTest : StringSpec({
             listOf(
                 TripsWithPlaces(
                     TripEntity(id = 1, name = "Trip to beach"),
-                    listOf(PlaceEntity(id = 1, tripId = 1, latitude = 12.0, longitude = 12.0))
+                    listOf(PlaceEntity(
+                        id = 1,
+                        tripId = 1,
+                        latitude = 12.0,
+                        longitude = 12.0,
+                        imageUrl = "imageUrl"
+                    ))
                 )
             )
         )
@@ -90,7 +96,13 @@ class TripsRepositoryImplTest : StringSpec({
             listOf(
                 TripsWithPlaces(
                     TripEntity(id = 1, name = "Trip to beach"),
-                    listOf(PlaceEntity(id = 1, tripId = 1, latitude = 12.0, longitude = 12.0))
+                    listOf(PlaceEntity(
+                        id = 1,
+                        tripId = 1,
+                        latitude = 12.0,
+                        longitude = 12.0,
+                        imageUrl = "imageUrl"
+                    ))
                 )
             )
         )
@@ -112,7 +124,13 @@ class TripsRepositoryImplTest : StringSpec({
             listOf(
                 TripsWithPlaces(
                     TripEntity(id = 1, name = "Trip to beach"),
-                    listOf(PlaceEntity(id = 1, tripId = 1, latitude = 12.0, longitude = 12.0))
+                    listOf(PlaceEntity(
+                        id = 1,
+                        tripId = 1,
+                        latitude = 12.0,
+                        longitude = 12.0,
+                        imageUrl = "imageUrl"
+                    ))
                 )
             )
         )
