@@ -6,7 +6,9 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
 import android.content.Intent
+import android.location.Location
 import android.os.IBinder
+import android.os.Looper
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
@@ -16,9 +18,12 @@ import com.gowthamraj07.journeytracker.data.db.dao.PlaceDao
 import com.gowthamraj07.journeytracker.data.db.dao.TripDao
 import com.gowthamraj07.journeytracker.data.db.entities.PlaceEntity
 import com.gowthamraj07.journeytracker.data.db.entities.TripEntity
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 
-class TripsServices: Service() {
+class TripsServices : Service() {
 
     private val tripDao: TripDao by inject()
     private val placeDao: PlaceDao by inject()
@@ -43,7 +48,9 @@ class TripsServices: Service() {
 
         startForeground(1, notification)
 
-        captureCurrentLocation()
+        CoroutineScope(Dispatchers.IO).launch {
+            captureCurrentLocation()
+        }
 
         return START_NOT_STICKY
     }
@@ -59,31 +66,12 @@ class TripsServices: Service() {
     }
 
     @SuppressLint("MissingPermission")
-    private fun captureCurrentLocation() {
+    private suspend fun captureCurrentLocation() {
         locationCallback = object : LocationCallback() {
-             override fun onLocationResult(locationResult: LocationResult) {
-                for (location in locationResult.locations){
-                    if(tripId == 0L) {
-                        tripId = tripDao.insert(
-                            TripEntity(
-                                name = "Trip $tripId"
-                            )
-                        )
-                        placeDao.insert(
-                            PlaceEntity(
-                                tripId = tripId,
-                                latitude = location.latitude,
-                                longitude = location.longitude
-                            )
-                        )
-                    } else {
-                        placeDao.insert(
-                            PlaceEntity(
-                                tripId = tripId,
-                                latitude = location.latitude,
-                                longitude = location.longitude
-                            )
-                        )
+            override fun onLocationResult(locationResult: LocationResult) {
+                for (location in locationResult.locations) {
+                    CoroutineScope(Dispatchers.IO).launch {
+                        save(location)
                     }
                 }
             }
@@ -91,7 +79,32 @@ class TripsServices: Service() {
 
         val locationRequest = LocationRequest.Builder(10000).build()
         val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-        fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null)
+        fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
+    }
+
+    private suspend fun save(location: Location) {
+        if (tripId == 0L) {
+            tripId = tripDao.insert(
+                TripEntity(
+                    name = "Trip $tripId"
+                )
+            )
+            placeDao.insert(
+                PlaceEntity(
+                    tripId = tripId,
+                    latitude = location.latitude,
+                    longitude = location.longitude
+                )
+            )
+        } else {
+            placeDao.insert(
+                PlaceEntity(
+                    tripId = tripId,
+                    latitude = location.latitude,
+                    longitude = location.longitude
+                )
+            )
+        }
     }
 
     private fun createNotificationChannel() {

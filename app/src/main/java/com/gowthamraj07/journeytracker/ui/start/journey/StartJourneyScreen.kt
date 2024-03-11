@@ -35,6 +35,7 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.PermissionStatus
 import com.google.accompanist.permissions.rememberPermissionState
+import com.gowthamraj07.journeytracker.services.TripsServices
 import com.gowthamraj07.journeytracker.ui.destinations.OngoingJourneyScreenDestination
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -158,6 +159,7 @@ fun ShowDialogExplainWhyPermissionIsNeeded(locationPermissionState: PermissionSt
 
 @Composable
 private fun StartJourneyContent(paddingValues: PaddingValues, navigator: DestinationsNavigator) {
+    val context = LocalContext.current
     Column(
         modifier = Modifier
             .background(color = MaterialTheme.colorScheme.surface)
@@ -178,6 +180,7 @@ private fun StartJourneyContent(paddingValues: PaddingValues, navigator: Destina
         Button(
             modifier = Modifier.align(Alignment.CenterHorizontally),
             onClick = {
+                context.startForegroundService(Intent(context, TripsServices::class.java))
                 navigator.navigate(OngoingJourneyScreenDestination(tripId = 0))
             }
         ) {

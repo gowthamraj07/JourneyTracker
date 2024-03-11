@@ -18,6 +18,7 @@ import org.koin.android.ext.koin.androidApplication
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 val dependencies = module {
 
@@ -32,6 +33,7 @@ val dependencies = module {
     single<FlickrApi> {
         Retrofit.Builder()
             .baseUrl("https://www.flickr.com/services/")
+            .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(FlickrApi::class.java)
     }
