@@ -14,8 +14,8 @@ import androidx.room.PrimaryKey
     )
 ])
 data class PlaceEntity(
-    @PrimaryKey(autoGenerate = true) val id: Int = 0,
-    @ColumnInfo(name = "tripId") val tripId: Int,
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    @ColumnInfo(name = "tripId") val tripId: Long,
     @ColumnInfo(name = "latitude" ) val latitude: Double,
     @ColumnInfo(name = "longitude" ) val longitude: Double,
 )
