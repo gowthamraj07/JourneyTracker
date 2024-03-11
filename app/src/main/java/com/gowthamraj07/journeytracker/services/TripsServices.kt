@@ -25,6 +25,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.koin.android.BuildConfig
 import org.koin.android.ext.android.inject
 
 class TripsServices : LifecycleService() {
@@ -156,7 +157,7 @@ class TripsServices : LifecycleService() {
 
     companion object {
         const val MIN_DELAY_TO_UNBIND = 2000L
-        const val ACTION_STOP_UPDATES = "STOP_SERVICE"
+        const val ACTION_STOP_UPDATES = BuildConfig.LIBRARY_PACKAGE_NAME + "STOP_SERVICE"
         const val NOTIFICATION_CHANNEL_ID = "LocationUpdates"
         const val NOTIFICATION_ID = 1
     }
