@@ -1,13 +1,18 @@
 package com.gowthamraj07.journeytracker.services
 
+import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.ComponentName
 import android.content.Intent
 import android.content.ServiceConnection
+import android.content.pm.PackageManager
+import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION
 import android.os.Binder
+import android.os.Build
 import android.os.IBinder
+import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
@@ -27,48 +32,37 @@ class TripsServices : LifecycleService() {
     private lateinit var locationCallback: LocationCallback
 
     private val tripServiceBinder = TripServiceBinder()
-    private var observers = 0
-    private var isAlreadyInForeGround = false
 
     private val _tripId = MutableStateFlow<Long>(0)
     val tripId: Flow<Long> = _tripId
 
     override fun onBind(intent: Intent): IBinder {
         super.onBind(intent)
-        handleBinding()
         return tripServiceBinder
     }
 
-    override fun onRebind(intent: Intent?) {
-        super.onRebind(intent)
-        handleBinding()
-    }
-
-    private fun handleBinding() {
-        observers++
-//        startService(Intent(this, this::class.java))
-    }
-
     override fun onUnbind(intent: Intent?): Boolean {
-        observers--
         lifecycleScope.launch {
             delay(MIN_DELAY_TO_UNBIND)
-            handleUnbind()
         }
         return true
     }
 
-    private fun handleUnbind() {
-        if (observers == 0 && locationRepository.isServiceNeeded()) {
-            startServiceInForeground()
-        }
-    }
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        super.onStartCommand(intent, flags, startId)
 
-    private fun startServiceInForeground() {
-        if(!isAlreadyInForeGround) {
-            isAlreadyInForeGround = true
-            startShowingNotifications()
+        if (intent?.action == ACTION_STOP_UPDATES) {
+            stopLocationUpdates()
+            stopSelf()
         }
+
+        startShowingNotifications()
+
+        lifecycleScope.launch {
+            locationRepository.startCapturingLocations()
+        }
+
+        return START_STICKY
     }
 
     private fun startShowingNotifications() {
@@ -76,7 +70,7 @@ class TripsServices : LifecycleService() {
         val notificationChannel = NotificationChannel(
             NOTIFICATION_CHANNEL_ID,
             "Trips Service Channel",
-            NotificationManager.IMPORTANCE_DEFAULT
+            NotificationManager.IMPORTANCE_HIGH
         )
         val manager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         manager.createNotificationChannel(notificationChannel)
@@ -96,8 +90,26 @@ class TripsServices : LifecycleService() {
             .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
             .build()
 
-        startForeground(NOTIFICATION_ID, notification)
+
+        if (hasNecessaryPermissionsAvailable()) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                startForeground(NOTIFICATION_ID, notification, FOREGROUND_SERVICE_TYPE_LOCATION)
+            } else {
+                startForeground(NOTIFICATION_ID, notification)
+            }
+        }
     }
+
+    private fun hasNecessaryPermissionsAvailable() = (
+            ActivityCompat.checkSelfPermission(
+                applicationContext,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+                    && ActivityCompat.checkSelfPermission(
+                applicationContext,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+            )
 
     private fun getPendingIntentToStopTheService(): PendingIntent? = PendingIntent.getService(
         this,
@@ -106,27 +118,13 @@ class TripsServices : LifecycleService() {
         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
     )
 
-    private fun getPendingIntentToOpenTheAppOnClickingNotification(): PendingIntent? = PendingIntent.getActivity(
-        this,
-        0,
-        packageManager.getLaunchIntentForPackage(this.packageName),
-        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-    )
-
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        super.onStartCommand(intent, flags, startId)
-
-        if (intent?.action == ACTION_STOP_UPDATES) {
-            stopLocationUpdates()
-            stopSelf()
-        }
-
-        lifecycleScope.launch {
-            locationRepository.startCapturingLocations()
-        }
-
-        return START_STICKY
-    }
+    private fun getPendingIntentToOpenTheAppOnClickingNotification(): PendingIntent? =
+        PendingIntent.getActivity(
+            this,
+            0,
+            packageManager.getLaunchIntentForPackage(this.packageName),
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
 
     private fun stopLocationUpdates() {
         lifecycleScope.launch {
@@ -164,7 +162,7 @@ class TripsServices : LifecycleService() {
     }
 }
 
-class TripsServiceConnection: ServiceConnection {
+class TripsServiceConnection : ServiceConnection {
 
     var service: TripsServices? = null
         private set
