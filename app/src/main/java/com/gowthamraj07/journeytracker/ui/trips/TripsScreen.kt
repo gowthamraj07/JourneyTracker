@@ -164,7 +164,7 @@ private fun BoxScope.CardTitle(trip: Trip) {
 private fun CardBackgroundImage(trip: Trip) {
     val painter = rememberAsyncImagePainter(
         ImageRequest.Builder(LocalContext.current)
-            .data(data = trip.image)
+            .data(data = (trip.image as TripImage.RemoteImage).url)
             .apply(block = {
                 placeholder(R.drawable.bouncing_circles)
                 error(R.drawable.error_loading_image)
@@ -176,7 +176,6 @@ private fun CardBackgroundImage(trip: Trip) {
         contentDescription = "Loaded image",
         modifier = Modifier.fillMaxWidth(),
         contentScale = ContentScale.Crop,
-        alpha = 0.1f
     )
 }
 
