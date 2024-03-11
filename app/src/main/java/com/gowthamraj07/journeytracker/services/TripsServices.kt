@@ -55,12 +55,12 @@ class TripsServices : LifecycleService() {
         if (intent?.action == ACTION_STOP_UPDATES) {
             stopLocationUpdates()
             stopSelf()
-        }
+        } else {
+            startShowingNotifications()
 
-        startShowingNotifications()
-
-        lifecycleScope.launch {
-            locationRepository.startCapturingLocations()
+            lifecycleScope.launch {
+                locationRepository.startCapturingLocations()
+            }
         }
 
         return START_STICKY

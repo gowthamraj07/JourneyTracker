@@ -1,5 +1,6 @@
 package com.gowthamraj07.journeytracker.ui.ongoing.journey
 
+import android.content.Intent
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -33,6 +34,7 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.gowthamraj07.journeytracker.R
 import com.gowthamraj07.journeytracker.domain.Place
+import com.gowthamraj07.journeytracker.services.TripsServices
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
@@ -110,6 +112,7 @@ private fun OngoingJourneyScreenContent(
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 private fun TopBar(navigator: DestinationsNavigator) {
+    val context = LocalContext.current
     TopAppBar(
         title = {
             Text(
@@ -126,6 +129,9 @@ private fun TopBar(navigator: DestinationsNavigator) {
                 modifier = Modifier
                     .padding(16.dp)
                     .clickable {
+                        val intent = Intent(context, TripsServices::class.java)
+                        intent.action = TripsServices.ACTION_STOP_UPDATES
+                        context.startService(intent)
                         navigator.navigateUp()
                     }
             )
