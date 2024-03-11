@@ -62,7 +62,6 @@ class LocationRepositoryImpl(
             override fun onLocationResult(locationResult: LocationResult) {
                 for (location in locationResult.locations) {
                     CoroutineScope(Dispatchers.IO).launch {
-                        lastSavedLocation = location
                         saveIfNewLocationIsMoreThan100MetersFromLastSavedLocation(location)
 
                     }
@@ -80,6 +79,12 @@ class LocationRepositoryImpl(
     }
 
     private suspend fun saveIfNewLocationIsMoreThan100MetersFromLastSavedLocation(location: Location) {
+        if(lastSavedLocation == null) {
+            lastSavedLocation = location
+            save(location)
+            return
+        }
+
         lastSavedLocation?.let { lastLocation ->
 
             val distanceOver100Meters = distanceCalculator.isDistanceOver100Meters(
