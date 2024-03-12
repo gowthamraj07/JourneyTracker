@@ -8,7 +8,7 @@ import kotlin.math.sqrt
 /**
  * This class is used to calculate the distance between two points on the Earth's surface using Haversine formula.
  */
-class DistanceCalculator {
+class DistanceCalculator(private val distanceInMetersToCaptureLocation: Int = 100) {
 
     private val radiusOfEarthInMeters = 6371e3 // Earth radius in meters
 
@@ -22,6 +22,6 @@ class DistanceCalculator {
         return radiusOfEarthInMeters * c // Distance in meters
     }
 
-    fun isDistanceOver100Meters(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Boolean =
-        calculateDistance(lat1, lon1, lat2, lon2) > 100
+    fun isDistanceMoreThanLocationCapturingDistance(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Boolean =
+        calculateDistance(lat1, lon1, lat2, lon2) > distanceInMetersToCaptureLocation
 }

@@ -86,7 +86,7 @@ class LocationRepositoryImpl(
 
         lastSavedLocation?.let { lastLocation ->
 
-            val distanceOver100Meters = distanceCalculator.isDistanceOver100Meters(
+            val distanceOver100Meters = distanceCalculator.isDistanceMoreThanLocationCapturingDistance(
                 lastLocation.latitude,
                 lastLocation.longitude,
                 location.latitude,
