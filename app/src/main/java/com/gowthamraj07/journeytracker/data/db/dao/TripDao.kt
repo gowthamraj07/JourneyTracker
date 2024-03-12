@@ -10,9 +10,6 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TripDao {
-    @Query("SELECT * FROM trips")
-    fun getTrips(): Flow<List<TripEntity>>
-
     @Transaction
     @Query("SELECT * FROM trips")
     fun getTripsWithPlaces(): Flow<List<TripsWithPlaces>>
