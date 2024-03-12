@@ -169,14 +169,10 @@ private fun BoxScope.CardTitle(trip: Trip) {
 
 @Composable
 private fun CardBackgroundImage(trip: Trip) {
-    val painter = rememberAsyncImagePainter(
-        ImageRequest.Builder(LocalContext.current)
-            .data(data = (trip.image as TripImage.RemoteImage).url)
-            .apply(block = {
-                placeholder(R.drawable.bouncing_circles)
-                error(R.drawable.error_loading_image)
-            }).build()
-    )
+    val painter = when(val image = trip.image){
+        is TripImage.LocalImage -> asyncImagePainter(image)
+        is TripImage.RemoteImage -> asyncImagePainter(image)
+    }
 
     Image(
         painter = painter,
@@ -185,6 +181,28 @@ private fun CardBackgroundImage(trip: Trip) {
         contentScale = ContentScale.Crop,
     )
 }
+
+@Composable
+private fun asyncImagePainter(tripImage: TripImage.RemoteImage) =
+    rememberAsyncImagePainter(
+        ImageRequest.Builder(LocalContext.current)
+            .data(data = tripImage.url)
+            .apply(block = {
+                placeholder(R.drawable.bouncing_circles)
+                error(R.drawable.error_loading_image)
+            }).build()
+    )
+
+@Composable
+private fun asyncImagePainter(tripImage: TripImage.LocalImage) =
+    rememberAsyncImagePainter(
+        ImageRequest.Builder(LocalContext.current)
+            .data(data = tripImage.id)
+            .apply(block = {
+                placeholder(R.drawable.bouncing_circles)
+                error(R.drawable.error_loading_image)
+            }).build()
+    )
 
 @Composable
 fun ColumnScope.EmptyTripsState() {

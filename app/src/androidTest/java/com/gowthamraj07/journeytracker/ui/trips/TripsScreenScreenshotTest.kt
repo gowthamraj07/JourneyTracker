@@ -1,6 +1,7 @@
 package com.gowthamraj07.journeytracker.ui.trips
 
 import androidx.compose.ui.test.junit4.createComposeRule
+import com.gowthamraj07.journeytracker.R
 import com.gowthamraj07.journeytracker.domain.Trip
 import com.gowthamraj07.journeytracker.domain.TripImage
 import com.karumi.shot.ScreenshotTest
@@ -43,11 +44,8 @@ class TripsScreenScreenshotTest : ScreenshotTest {
                                         Trip(
                                             id = 1,
                                             name = "Trip to beach",
-                                            image = TripImage.RemoteImage(
-                                                url = "https://fastly.picsum.photos/id/2/5000/3333.jpg?hmac=_KDkqQVttXw_nM-RyJfLImIbafFrqLsuGO5YuHqD-qQ"
-                                            )
+                                            image = TripImage.LocalImage(R.drawable.bouncing_circles)
                                         )
-
                                     )
                                 )
                             )
