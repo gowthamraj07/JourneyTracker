@@ -70,6 +70,17 @@ class TripsServices : LifecycleService() {
         return START_STICKY
     }
 
+    override fun stopService(name: Intent?): Boolean {
+        stopCapturingLocation()
+        return super.stopService(name)
+    }
+
+    fun notifyObserversWithNewTripId(tripId: Long) {
+        _tripId.update {
+            tripId
+        }
+    }
+
     private fun startShowingNotifications() {
         // Create the NotificationChannel
         val notificationChannel = NotificationChannel(
@@ -105,16 +116,20 @@ class TripsServices : LifecycleService() {
         }
     }
 
-    private fun hasNecessaryPermissionsAvailable() = (
-            ActivityCompat.checkSelfPermission(
-                applicationContext,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED
-                    && ActivityCompat.checkSelfPermission(
-                applicationContext,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED
-            )
+    private fun hasNecessaryPermissionsAvailable(): Boolean {
+        val accessFineLocationPermission = ActivityCompat.checkSelfPermission(
+            applicationContext,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        )
+        val accessCoarseLocationPermission = ActivityCompat.checkSelfPermission(
+            applicationContext,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        )
+
+        return accessFineLocationPermission == PackageManager.PERMISSION_GRANTED
+                        && accessCoarseLocationPermission == PackageManager.PERMISSION_GRANTED
+
+    }
 
     private fun getPendingIntentToStopTheService(): PendingIntent? = PendingIntent.getService(
         this,
@@ -137,20 +152,9 @@ class TripsServices : LifecycleService() {
         }
     }
 
-    override fun stopService(name: Intent?): Boolean {
-        stopCapturingLocation()
-        return super.stopService(name)
-    }
-
     private fun stopCapturingLocation() {
         val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         fusedLocationClient.removeLocationUpdates(locationCallback)
-    }
-
-    fun notifyObserversWithNewTripId(tripId: Long) {
-        _tripId.update {
-            tripId
-        }
     }
 
     internal inner class TripServiceBinder : Binder() {
@@ -179,7 +183,6 @@ class TripsServiceConnection : ServiceConnection {
     override fun onServiceDisconnected(name: ComponentName?) {
         service = null
     }
-
 }
 
 

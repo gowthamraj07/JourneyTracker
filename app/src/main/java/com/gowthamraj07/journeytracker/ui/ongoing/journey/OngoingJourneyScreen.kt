@@ -1,7 +1,6 @@
 package com.gowthamraj07.journeytracker.ui.ongoing.journey
 
 import android.content.Intent
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -21,7 +20,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -62,7 +60,6 @@ fun OngoingJourneyScreen(
     }
 
     LaunchedEffect(Unit) {
-        Log.d("Gowtham", "Starting OngoingJourneyScreen for tripId $tripId")
         viewModel.loadPlacesFor(tripId)
     }
 }
@@ -94,13 +91,6 @@ private fun OngoingJourneyScreenContent(
         ) {
             val listOfPlace = places.collectAsState(initial = emptyList())
             LazyColumn {
-
-                item {
-                    SideEffect {
-                        Log.d("Gowtham", "OngoingJourneyScreenContent: ************** ")
-                    }
-                }
-
                 items(listOfPlace.value) { place ->
                     PlaceDetails(place)
                 }
@@ -147,11 +137,6 @@ fun PlaceDetails(place: Place) {
             .padding(top = 16.dp, start = 16.dp, end = 16.dp)
             .heightIn(max = 200.dp)
     ) {
-
-        SideEffect {
-            Log.d("Gowtham", "PlaceDetails: imageUrl ${place.imageUrl}")
-        }
-
         Box {
             val painter = rememberAsyncImagePainter(
                 ImageRequest.Builder(LocalContext.current)

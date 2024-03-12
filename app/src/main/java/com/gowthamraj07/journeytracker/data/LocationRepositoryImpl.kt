@@ -6,7 +6,6 @@ import android.location.Location
 import android.os.Looper
 import android.os.VibrationEffect
 import android.os.Vibrator
-import android.util.Log
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -37,12 +36,11 @@ class LocationRepositoryImpl(
 ) : LocationRepository {
 
     private var isServiceRunning = false
+    private var lastSavedLocation: Location? = null
     private var tripId: Long = 0
 
     private lateinit var locationCallback: LocationCallback
     private lateinit var fusedLocationClient: FusedLocationProviderClient
-
-    private var lastSavedLocation: Location? = null
 
     override fun isServiceNeeded(): Boolean = isServiceRunning
 
@@ -125,25 +123,14 @@ class LocationRepositoryImpl(
             )
         )
 
-        Log.d(
-            "Gowtham",
-            "startCapturingLocations: notifyObserversWithNewTripId with trip id ($tripId)"
-        )
         service.service?.notifyObserversWithNewTripId(tripId)
-
-        Log.d("Gowtham", "saveTripAndPlace: trip with new id $tripId")
         savePlace(location)
     }
 
     private suspend fun savePlace(location: Location) {
-        Log.d("Gowtham", "savePlace: saving new place")
-
-        val flickrJsonResponse =
-            flickrApi.getLocationDetails(location.latitude, location.longitude)
+        val flickrJsonResponse = flickrApi.getLocationDetails(location.latitude, location.longitude)
         val flickrResponse = flickrResponseParser.parse(flickrJsonResponse)
-        val imageUrl =
-            "https://live.staticflickr.com/${flickrResponse.serverId}/${flickrResponse.id}_${flickrResponse.secret}.jpg"
-
+        val imageUrl = "https://live.staticflickr.com/${flickrResponse.serverId}/${flickrResponse.id}_${flickrResponse.secret}.jpg"
 
         placeDao.insert(
             PlaceEntity(
