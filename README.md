@@ -32,6 +32,20 @@ This is a simple android application that allows users to track their journeys. 
 - User can start a journey
 - User can stop a journey
 
+## Setup to run Unit testing inside Android Studio
+- Install the Kotest plugin from the Android Studio plugin marketplace
+- URL: https://plugins.jetbrains.com/plugin/14080-kotest
+
+## Setup to run screenshot testing
+- Use the following gradle command to run the screenshot tests and to capture the screenshots
+```bash
+./gradlew :app:executeScreenshotTests -Precord
+```
+- Use the following gradle command to run the screenshot tests and to compare the screenshots
+```bash
+./gradlew :app:executeScreenshotTests
+```
+
 ## Note
 - The main focus is on the architecture and the use of Jetpack Compose. 
   - The error handling and edge cases are handled with limited scope
