@@ -63,7 +63,6 @@ class LocationRepositoryImpl(
                 for (location in locationResult.locations) {
                     CoroutineScope(Dispatchers.IO).launch {
                         saveIfNewLocationIsMoreThan100MetersFromLastSavedLocation(location)
-
                     }
                 }
             }
@@ -98,6 +97,8 @@ class LocationRepositoryImpl(
                 save(location)
             }
         }
+
+        lastSavedLocation = location
     }
 
     private suspend fun save(location: Location) {
