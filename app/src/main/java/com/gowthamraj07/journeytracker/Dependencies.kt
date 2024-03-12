@@ -37,7 +37,7 @@ val dependencies = module {
 
     single<FlickrApi> {
         Retrofit.Builder()
-            .baseUrl("https://www.flickr.com/services/")
+            .baseUrl("https://api.flickr.com/services/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(FlickrApi::class.java)
